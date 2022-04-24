@@ -12,13 +12,12 @@ public class ProcessorService {
 	private final Collection<Processor> processors;
 
 	public ProcessorService(ApplicationContext context) {
-		processors = context.getBeansOfType(Processor.class).values();
+		processors = context.getBeansOfType(Processor.class).values().stream().sorted(Comparator.comparing(Processor::getSortKey)).toList();
 	}
 
 	public List<Result> process(String text) {
-		return processors.stream()
-				.flatMap(processor -> processor.process(text).stream())
-				.sorted(Comparator.comparingInt(Result::probability).reversed())
+		return processors.stream().flatMap(processor -> processor.process(text).stream())
+				.sorted(Comparator.comparing(Result::highlight).reversed())
 				.toList();
 	}
 

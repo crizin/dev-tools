@@ -1,8 +1,12 @@
 package net.crizin.devtools.processor;
 
-public interface ProcessorInterface {
+import java.util.Optional;
 
-	boolean canProcess(String text);
+public interface Processor {
 
-	String process(String text);
+	String getTitle();
+
+	String getSortKey();
+
+	Optional<Result> process(String text);
 }

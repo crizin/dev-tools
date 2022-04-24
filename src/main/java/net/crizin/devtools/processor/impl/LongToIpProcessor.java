@@ -2,17 +2,16 @@ package net.crizin.devtools.processor.impl;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 import net.crizin.devtools.processor.Processor;
 import net.crizin.devtools.processor.Result;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IpToLongProcessor implements Processor {
+public class LongToIpProcessor implements Processor {
 
-	private static final String TITLE = "IP to Long value";
-	private static final String SORT_KEY = "10.ip2long";
+	private static final String TITLE = "Long value to IP";
+	private static final String SORT_KEY = "90.ip2long";
 
 	@Override
 	public String getTitle() {
@@ -26,16 +25,26 @@ public class IpToLongProcessor implements Processor {
 
 	@Override
 	public Optional<Result> process(String text) {
+		long value;
+
+		try {
+			value = Long.parseLong(text);
+		} catch (Exception e) {
+			return Optional.empty();
+		}
+
+		if (value < 0) {
+			return Optional.empty();
+		}
+
 		InetAddress inetAddress;
 
 		try {
-			inetAddress = InetAddress.getByName(text.trim());
+			inetAddress = InetAddress.getByName(text);
 		} catch (UnknownHostException e) {
 			return Optional.empty();
 		}
 
-		int result = ByteBuffer.wrap(inetAddress.getAddress()).getInt();
-
-		return Optional.of(new Result(TITLE, String.valueOf(result), true));
+		return Optional.of(new Result(TITLE, inetAddress.getHostAddress(), false));
 	}
 }

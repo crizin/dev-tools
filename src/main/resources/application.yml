@@ -1,1 +1,15 @@
+server:
+  port: 10014
 
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+  thymeleaf:
+    cache: false
+
+logging:
+  level:
+    root: debug

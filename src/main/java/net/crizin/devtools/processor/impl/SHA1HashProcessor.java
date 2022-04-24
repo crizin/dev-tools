@@ -1,6 +1,8 @@
-package net.crizin.devtools.processor;
+package net.crizin.devtools.processor.impl;
 
 import java.util.Optional;
+import net.crizin.devtools.processor.Processor;
+import net.crizin.devtools.processor.Result;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.stereotype.Component;
 
@@ -8,10 +10,16 @@ import org.springframework.stereotype.Component;
 public class SHA1HashProcessor implements Processor {
 
 	private static final String TITLE = "SHA-1 Hash";
+	private static final String SORT_KEY = "99.hash.sha1";
 
 	@Override
 	public String getTitle() {
 		return TITLE;
+	}
+
+	@Override
+	public String getSortKey() {
+		return SORT_KEY;
 	}
 
 	@Override
@@ -20,6 +28,6 @@ public class SHA1HashProcessor implements Processor {
 			return Optional.empty();
 		}
 
-		return Optional.of(new Result(TITLE, DigestUtils.sha1Hex(text), 0));
+		return Optional.of(new Result(TITLE, DigestUtils.sha1Hex(text), false));
 	}
 }

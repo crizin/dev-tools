@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dev tools</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+		  integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet"
+		  href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&amp;family=Nanum+Gothic+Coding&&amp;family=Noto+Sans+KR&&amp;display=swap">
+	<style>
+      body {
+        font-family: 'Noto Sans KR', sans-serif;
+      }
+
+      .font-monospace {
+        font-family: 'JetBrains Mono', 'Nanum Gothic Coding', monospace !important;
+      }
+	</style>
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-C28BRMWY7Z"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+
+		gtag('js', new Date());
+		gtag('config', 'G-C28BRMWY7Z');
+	</script>
+</head>
+<body>
+<div class="container-fluid py-3 px-4">
+	<div class="mb-3">
+		<div class="btn-group btn-group-sm mb-3">
+			<button type="button" id="timestamp-button" class="btn btn-outline-secondary">Unix Timestamp</button>
+			<button type="button" id="hash-button" class="btn btn-outline-secondary">Random Hash</button>
+		</div>
+		<textarea class="form-control" id="text" rows="5" title="Any text to process" placeholder="Type something" autofocus></textarea>
+	</div>
+	<div id="result">
+		<div class="my-3">
+			Convert with
+			<span th:each="title,iter : ${titles}"><span th:if="${iter.index > 0}">, </span><code th:text="${title}"></code></span>.
+		</div>
+	</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+	$(document).ready(() => {
+		const textarea = $('#text');
+		const result = $('#result');
+		let request;
+
+		function convert(text) {
+			request = $.ajax({
+				url: 'convert',
+				method: 'POST',
+				data: {text: text},
+				beforeSend: function () {
+					request && request.abort();
+				},
+				success: function (html) {
+					result.html(html);
+				}
+			});
+		}
+
+		textarea.bind('input propertychange', function () {
+			convert($(this).val());
+		});
+
+		$('#timestamp-button').click(function () {
+			$.get('preset/timestamp').done(value => {
+				textarea.val(value);
+				convert(value);
+			});
+		});
+
+		$('#hash-button').click(function () {
+			$.get('preset/random').done(value => {
+				textarea.val(value);
+				convert(value);
+			});
+		});
+
+		result.delegate('.copy-button', 'click', function () {
+			const $this = $(this);
+
+			try {
+				const text = $this.closest('.card').find('.result').text();
+				const temp = $('<input>');
+				$('body').append(temp);
+				temp.val(text).select();
+				document.execCommand('copy');
+				temp.remove();
+				$this.text('Copied');
+				setTimeout(function () {
+					$this.text('Copy');
+				}, 500);
+			} catch (e) {
+				$this.text('Failed');
+				setTimeout(function () {
+					$this.text('Copy');
+				}, 500);
+			}
+		});
+	});
+</script>
+</body>
+</html>

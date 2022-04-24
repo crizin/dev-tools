@@ -1,18 +1,20 @@
 package net.crizin.devtools.processor.impl;
 
-import com.github.sisyphsu.dateparser.DateParserUtils;
-import java.time.OffsetDateTime;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import net.crizin.devtools.processor.Processor;
 import net.crizin.devtools.processor.Result;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class DateTimeProcessor implements Processor {
+public class IpToLongProcessor implements Processor {
 
-	private static final String TITLE = "DateTime to Timestamp";
-	private static final String SORT_KEY = "10.datetime";
+	private static final String TITLE = "IP to Long value";
+	private static final String SORT_KEY = "90.ip2long";
+	private static final Pattern IP_PATTERN = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
 
 	@Override
 	public String getTitle() {
@@ -26,18 +28,20 @@ public class DateTimeProcessor implements Processor {
 
 	@Override
 	public Optional<Result> process(String text) {
-		if (StringUtils.isNumericSpace(text)) {
+		if (!IP_PATTERN.matcher(text.trim()).matches()) {
 			return Optional.empty();
 		}
 
-		OffsetDateTime dateTime;
+		InetAddress inetAddress;
 
 		try {
-			dateTime = DateParserUtils.parseOffsetDateTime(text);
-		} catch (Exception e) {
+			inetAddress = InetAddress.getByName(text.trim());
+		} catch (UnknownHostException e) {
 			return Optional.empty();
 		}
 
-		return Optional.of(new Result(TITLE, String.valueOf(dateTime.toInstant().getEpochSecond()), true));
+		int result = ByteBuffer.wrap(inetAddress.getAddress()).getInt();
+
+		return Optional.of(new Result(TITLE, String.valueOf(result), true));
 	}
 }

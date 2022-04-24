@@ -1,20 +1,20 @@
 package net.crizin.devtools.processor.impl;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import net.crizin.devtools.processor.Processor;
 import net.crizin.devtools.processor.Result;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class IpToLongProcessor implements Processor {
+public class SafeFilenameProcessor implements Processor {
 
-	private static final String TITLE = "IP to Long value";
-	private static final String SORT_KEY = "90.ip2long";
-	private static final Pattern IP_PATTERN = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+	private static final String TITLE = "Convert to safe filename";
+	private static final String SORT_KEY = "90.safe.filename";
+	private static final String[] ADVISE_SEARCH = new String[]{":", "/", "*", "?", "<", ">", "\"", "\\", "|"};
+	private static final String[] ADVISE_REPLACEMENT = new String[]{"：", "／", "＊", "？", "〈", "〉", "＂", "＼", "｜"};
+	private static final Pattern WHITE_SPACE_PATTERN = Pattern.compile("\\s+");
 
 	@Override
 	public String getTitle() {
@@ -28,20 +28,13 @@ public class IpToLongProcessor implements Processor {
 
 	@Override
 	public Optional<Result> process(String text) {
-		if (!IP_PATTERN.matcher(text.trim()).matches()) {
+		String result = StringUtils.replaceEach(text, ADVISE_SEARCH, ADVISE_REPLACEMENT);
+		result = WHITE_SPACE_PATTERN.matcher(result).replaceAll(" ").trim();
+
+		if (text.trim().equals(result)) {
 			return Optional.empty();
 		}
 
-		InetAddress inetAddress;
-
-		try {
-			inetAddress = InetAddress.getByName(text.trim());
-		} catch (UnknownHostException e) {
-			return Optional.empty();
-		}
-
-		int result = ByteBuffer.wrap(inetAddress.getAddress()).getInt();
-
-		return Optional.of(new Result(TITLE, String.valueOf(result), true));
+		return Optional.of(new Result(TITLE, result, false));
 	}
 }

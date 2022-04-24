@@ -1,7 +1,7 @@
 package net.crizin.devtools.processor.impl;
 
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 import net.crizin.devtools.processor.Processor;
 import net.crizin.devtools.processor.Result;
@@ -9,12 +9,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UrlEncodeProcessor implements Processor {
+public class Base64EncodeProcessor implements Processor {
 
-	private static final String TITLE = "Encode URL";
-	private static final String SORT_KEY = "10.url.encode";
-	private static final String[] adviseSearch = new String[]{"+", "*", "%7E"};
-	private static final String[] adviseReplacement = new String[]{"%20", "%2A", "~"};
+	private static final String TITLE = "Encode Base64";
+	private static final String SORT_KEY = "90.base64.encode";
 
 	@Override
 	public String getTitle() {
@@ -28,12 +26,10 @@ public class UrlEncodeProcessor implements Processor {
 
 	@Override
 	public Optional<Result> process(String text) {
-		String encoded = StringUtils.replaceEach(URLEncoder.encode(text, StandardCharsets.UTF_8), adviseSearch, adviseReplacement);
-
-		if (encoded.equals(text)) {
+		if (StringUtils.isBlank(text)) {
 			return Optional.empty();
 		}
 
-		return Optional.of(new Result(TITLE, encoded, false));
+		return Optional.of(new Result(TITLE, Base64.getEncoder().encodeToString(text.getBytes(StandardCharsets.UTF_8)), false));
 	}
 }

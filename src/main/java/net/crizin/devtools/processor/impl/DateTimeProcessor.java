@@ -1,19 +1,18 @@
 package net.crizin.devtools.processor.impl;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import com.github.sisyphsu.dateparser.DateParserUtils;
+import java.time.OffsetDateTime;
 import java.util.Optional;
-import java.util.regex.Pattern;
 import net.crizin.devtools.processor.Processor;
 import net.crizin.devtools.processor.Result;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UrlDecodeProcessor implements Processor {
+public class DateTimeProcessor implements Processor {
 
-	private static final String TITLE = "Decode URL";
-	private static final String SORT_KEY = "10.url.encode";
-	private static final Pattern ENCODED_URL_PATTERN = Pattern.compile("%[\\dA-F]{2}", Pattern.CASE_INSENSITIVE);
+	private static final String TITLE = "DateTime to Timestamp";
+	private static final String SORT_KEY = "10.datetime";
 
 	@Override
 	public String getTitle() {
@@ -27,12 +26,18 @@ public class UrlDecodeProcessor implements Processor {
 
 	@Override
 	public Optional<Result> process(String text) {
-		String decoded = URLDecoder.decode(text, StandardCharsets.UTF_8);
-
-		if (decoded.equals(text)) {
+		if (StringUtils.isNumericSpace(text)) {
 			return Optional.empty();
 		}
 
-		return Optional.of(new Result(TITLE, decoded, ENCODED_URL_PATTERN.matcher(text).find()));
+		OffsetDateTime dateTime;
+
+		try {
+			dateTime = DateParserUtils.parseOffsetDateTime(text);
+		} catch (Exception e) {
+			return Optional.empty();
+		}
+
+		return Optional.of(new Result(TITLE, String.valueOf(dateTime.toInstant().getEpochSecond()), true));
 	}
 }
