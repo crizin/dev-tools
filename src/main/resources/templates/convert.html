@@ -1,7 +1,10 @@
 <div class="card my-3" th:each="result : ${results}" th:classappend="${result.highlight} ? 'bg-secondary text-light' : 'bg-light text-dark'">
 	<div class="card-header">
-		<button type="button" class="btn btn-sm float-end copy-button"
+		<button type="button" class="btn btn-sm float-end ms-2 copy-button"
 				th:classappend="${result.highlight} ? 'btn-outline-light text-light' : 'btn-outline-dark'">COPY
+		</button>
+		<button type="button" class="btn btn-sm float-end ms-2 use-button"
+				th:classappend="${result.highlight} ? 'btn-outline-light text-light' : 'btn-outline-dark'">USE
 		</button>
 		<h5 th:text="${result.title}"></h5>
 	</div>

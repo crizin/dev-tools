@@ -109,6 +109,13 @@
 				}, 500);
 			}
 		});
+
+		result.delegate('.use-button', 'click', function () {
+			const $this = $(this);
+			const text = $this.closest('.card').find('.result').text();
+			textarea.val(text);
+			convert(text);
+		});
 	});
 </script>
 </body>
