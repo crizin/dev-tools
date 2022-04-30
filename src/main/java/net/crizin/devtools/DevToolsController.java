@@ -2,7 +2,9 @@ package net.crizin.devtools;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Iterator;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import net.crizin.devtools.processor.ProcessorService;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+@Slf4j
 @Controller
 public class DevToolsController {
 
@@ -53,6 +56,12 @@ public class DevToolsController {
 	@ResponseBody
 	@GetMapping(value = "/ip", produces = "text/plain")
 	public String ip(HttpServletRequest request) {
-		return request.getRemoteAddr();
+		// print all headers
+		for (Iterator<String> it = request.getHeaderNames().asIterator(); it.hasNext(); ) {
+			String header = it.next();
+			for (Iterator<String> it2 = request.getHeaders(header).asIterator(); it2.hasNext(); ) {
+				log.info(header + ": " + it2.next());
+			}
+		}
 	}
 }
