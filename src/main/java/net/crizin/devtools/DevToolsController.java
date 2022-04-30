@@ -50,6 +50,7 @@ public class DevToolsController {
 		return "convert";
 	}
 
+	@ResponseBody
 	@GetMapping(value = "/ip", produces = "text/plain")
 	public String ip(HttpServletRequest request) {
 		return request.getRemoteAddr();
