@@ -2,6 +2,7 @@ package net.crizin.devtools;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import javax.servlet.http.HttpServletRequest;
 import net.crizin.devtools.processor.ProcessorService;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -47,5 +48,10 @@ public class DevToolsController {
 		model.addAttribute("results", processorService.process(text));
 
 		return "convert";
+	}
+
+	@GetMapping(value = "/ip", produces = "text/plain")
+	public String ip(HttpServletRequest request) {
+		return request.getRemoteAddr();
 	}
 }
